@@ -1,0 +1,230 @@
+﻿@model IEnumerable<EFCRUDMVC.Models.tblUsers>
+
+@{ViewBag.Title = "Index";}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    @*<script type="text/javascript" src="~/Scripts/jquery-3.3.1.min.js"></script>
+        <link href="~/Content/bootstrap.css" rel="stylesheet" />
+        <link href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+        <link href="https://cdn.datatables.net/responsive/2.1.1/css/responsive.bootstrap.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+        <script type="text/javascript" src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js "></script>*@
+</head>
+<body>
+    <h2>Index</h2>
+
+    <p>
+        @Html.ActionLink("Create New", "Create")
+    </p>
+
+    <table class="table" id="TblInfo">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Name)</th>
+
+                <th>@Html.DisplayNameFor(model => model.Gender)</th>
+
+                <th>@Html.DisplayNameFor(model => model.BirthDate)</th>
+
+                <th>@Html.DisplayNameFor(model => model.Email)</th>
+
+                <th>@Html.DisplayNameFor(model => model.City)</th>
+
+                <th>@Html.DisplayNameFor(model => model.PhoneNo)</th>
+                <th></th>
+            </tr>
+
+        </thead>
+        @foreach (var item in Model)
+        {
+            <tbody class="InfoTBody">
+                <tr>
+                    <td>
+                        @Html.DisplayFor(model => item.Name)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(model => item.Gender)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(model => item.BirthDate)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(model => item.Email)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(model => item.City)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(model => item.PhoneNo)
+                    </td>
+
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new { id = item.UserId }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.UserId }) |
+                        @*<button type="button" id="btnShowModal" data-toggle="modal" data-target="#myModal" onclick='location.href = "@Url.Action("Delete", "User", new { id = item.UserId })"'>
+                                Delete
+                            </button>*@
+                        @Html.ActionLink("Delete", "Delete", new { id = item.UserId, data_toggle = "modal", data_target = "#myModal" })
+                    </td>
+
+                </tr>
+            </tbody>
+        }
+
+    </table>
+
+    <script type="text/javascript" src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="//cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" />
+    <script type="text/javascript" src="//cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <link href="https://cdn.datatables.net/1.10.15/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js "></script>
+
+    <script type="text/javascript">
+        var js = jQuery.noConflict(true);
+        js(document).ready(function () {
+            LoadListing();
+        });
+        function FunAdd() { 
+            window.location.href = "/User/Create"
+            var userObj = {
+                UserId: $('#UserId').val(),
+                Name: $('#Name').val(),
+                Gender: $('#Gender').val(),
+                City: $('#City').val(),
+                BirthDate: $('#BirthDate').val(),
+                Email: $('#Email').val(),
+                PhoneNo: $('#PhoneNo').val(),
+                Privacy: $('#Privacy').val(),
+            };
+            $.ajax({
+                url: "/User/Create",
+                data: JSON.stringify(userObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    LoadListing();
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+
+        function FunEdit(element) {
+            var id = $(element).closest('tr').find('input[type=hidden]').val();
+            //window.location.href = "/User/Edit?id=" + id;
+            var userObj = {
+                UserId: $('#UserId').val(),
+                Name: $('#Name').val(),
+                Gender: $('#Gender').val(),
+                City: $('#City').val(),
+                BirthDate: $('#BirthDate').val(),
+                Email: $('#Email').val(),
+                PhoneNo: $('#PhoneNo').val(),
+                Privacy: $('#Privacy').val(),
+            };
+            $.ajax({
+                url: "/User/Edit?id=" + id,
+                data: JSON.stringify(userObj),
+                type: "POST",
+                contentType: "application/json;charset=utf-8",
+                dataType: "json",
+                success: function (result) {
+                    LoadListing();
+                    //$('#myModal').modal('hide');
+                    //window.location.href = "/User/Edit?id=" + id;
+                    $('#UserId').val("");
+                    $('#Name').val("");
+                    $('#Gender').val("");
+                    $('#City').val("");
+                    $('#BirthDate').val("");
+                    $('#Email').val("");
+                    $('#PhoneNo').val("");
+                    $('#Privacy').val("");
+                },
+                error: function (errormessage) {
+                    alert(errormessage.responseText);
+                }
+            });
+        }
+ 
+        function FunDetail(element) {
+            var id = $(element).closest('tr').find('input[type=hidden]').val();
+            window.location.href = "/User/Details?id=" + id;
+        }
+
+        function FunRemove(element) {
+            var id = $(element).closest('tr').find('input[type=hidden]').val();
+            $('#myModal').modal('show');
+            //if (confirm("do you want to remove?")) {
+                $.ajax({
+                    //type: "POST",
+                    url: "/User/Delete?id=" + id,
+                    async: false,
+                    data: { id: id },
+                    success: function (data) {
+                       // if (data == 'pass') {
+                            $('#myModal').modal('show');
+                            alert('Removed successfully.');
+                            window.location.reload();
+                        //} else {
+                        //    alert("Failure due to :" + data)
+                        //}
+                    },
+                    failure: function (err) {
+
+                    }
+                });
+            //}
+        }
+        function LoadListing() {
+            var userdata = [];
+            $.ajax({
+                type: "POST",
+                url: "/User/GetListInfo",
+                async: false,
+                success: function (data) {
+                    $.each(data, function (key, value) {
+                        var editbtn = "<a onclick='FunEdit(this)' class='btn btn-primary'>Edit</a>";
+                        var detailbtn = "<a onclick='FunDetail(this)' class='btn btn-secondary'>Detail</a>";
+                        var removebtn = "<a onclick='FunRemove(this)'  class='btn btn-danger'>Remove</a>";
+                        var hdn = "<input type='hidden' value=" + value.UserId + " />";
+                        var action = editbtn + " | " + detailbtn + " | " + removebtn + hdn;
+                        var date = parseInt(value.BirthDate.replace("/Date(", "").replace(")/", ""));
+                        var newDate = new Date(date).toLocaleDateString("en-US", {
+                            month: '2-digit', day: '2-digit', year: 'numeric'
+                        });
+                        userdata.push([value.Name, value.Gender, newDate, value.Email, value.City, value.PhoneNo,action])
+                    })
+                },
+
+                failure: function (err) {
+
+                }
+            });
+            js('#TblInfo').DataTable({
+                data: userdata,
+                columnDefs:
+                    [
+                        {
+                            "targets": [6],
+                            "searchable": false,
+                            "orderable": false
+                        },
+
+                    ],
+            });
+        }
+
+    </script>
+
+</body>
+</html>
